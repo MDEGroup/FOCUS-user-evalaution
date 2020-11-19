@@ -7,7 +7,7 @@ public class Connectors {
 
 	public enum Connector {
 		ORACLE("oracle.jdbc.driver.OracleDriver"),
-		MYSQL("com.mysql.jdbc.Driver");
+		MYSQL("com.mysql.cj.jdbc.Driver");
 		
 		private final String value;
 		
