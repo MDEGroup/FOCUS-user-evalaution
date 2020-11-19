@@ -1,8 +1,9 @@
 package jsoup_example.jsoup_example;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,7 +20,17 @@ public class App {
 	 * Parsing a Ansa news
 	 */
 	public static void main(String[] args) throws IOException {
+		System.out.println("Numero di news appartenenti alla categoria \"Calciomercato\": " + getCalciomercatoNews());
+		System.out.println();
 		
+		System.out.println("Lista di tutte le squadre che hanno vinto un match in trasferta:");
+		for (String player : getWinningAwayTeams()) {
+			System.out.println("	" + player);
+		}
+		System.out.println();
+
+		System.out.println("Giorno con la maggior differenza tra le temperature massima e minima: " + getDayWithBiggerTemperatureDifference());
+		System.out.println();
 	}
 	
 
@@ -31,8 +42,12 @@ public class App {
 		String url = "https://mdegroup.github.io/FOCUS-Appendix/tuttojuve.htm";
 		Document document = Jsoup.connect(url).get();
 		Elements images = document.select(".list-item");
-		images.parents();
+
 		int count = 0;
+		Iterator<Element> elementsIterator = images.listIterator();
+		while (elementsIterator.hasNext()) {
+			if (elementsIterator.next().attr("href").contains("calciomercato")) count ++;
+		}
 		return count;	
 	}
 
@@ -42,15 +57,29 @@ public class App {
 	 * Use "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)" as user agent string.
 	 * Extract the required information from https://mdegroup.github.io/FOCUS-Appendix/livescore.html
 	 */
-	public static List<String> getWinningAwayTeams() throws IOException {
+	public static List<String> getWinningAwayTeams() throws IOException{
 		String url = "https://mdegroup.github.io/FOCUS-Appendix/livescore.html";
-		Document document = Jsoup.connect(url)/*.userAgent("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)")*/.get();
+		Document document = Jsoup.connect(url).get();
 		Elements scores = document.getElementsByClass("sco");
-		scores.parents();
-		
-		List<String> result = new ArrayList();
+		Elements playersAway = scores.next();
 
-		return result;
+		List<String> results = new ArrayList<String>();
+		for (int i = 0; i < scores.size(); i++) {
+			try {
+				int scoreAway = Integer.parseInt(scores.get(i).getElementsByClass("awy").text());
+				int scoreHome = Integer.parseInt(scores.get(i).getElementsByClass("hom").text());
+
+				if(scoreAway > scoreHome) {
+					String playerWinner = playersAway.get(i).getElementsByClass("ply name").text();
+					
+					if(!results.contains(playerWinner)) results.add(playerWinner);
+				} 
+
+
+			}catch(NumberFormatException e) {}
+		}
+
+		return results;
 	}
 	
 	/*
@@ -61,11 +90,23 @@ public class App {
 	public static String getDayWithBiggerTemperatureDifference() throws IOException {
 		String url = "https://mdegroup.github.io/FOCUS-Appendix/meteo.html";
 		Document document = Jsoup.connect(url).get();
-		Elements weathers = document.select("span.dayDate");
-		String name = "";
+		Elements days = document.getElementsByClass("dayDate");
+		Elements minAndMaxTemperatures = document.getElementsByClass("temperature");
 		
+		String dayWithBiggerTemperatureDifference = "";
+		int biggerTemperatureDifference = 0;
+		for (int i = 0; i < days.size(); i++) {
+			int minTemp = Integer.parseInt(minAndMaxTemperatures.get(i*2).text().replace("°", ""));
+			int maxTemp = Integer.parseInt(minAndMaxTemperatures.get((i*2) + 1).text().replace("°", ""));
+			int currentDifference = maxTemp - minTemp;
 
-		return(name);
+			if(currentDifference > biggerTemperatureDifference) {
+				biggerTemperatureDifference = currentDifference;
+				dayWithBiggerTemperatureDifference = days.get(i).text();
+			}
+		}
+
+		return dayWithBiggerTemperatureDifference;
 	}
 	
 
