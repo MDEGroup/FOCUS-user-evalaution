@@ -129,23 +129,34 @@ public class Launcher {
 			if(!cmdLine.hasOption("sql")) throw new ParseException("No query provided");
 			String query = cmdLine.getOptionValue("sql");
 			
+			String protocol=null;
+			String file = "";
+			String headers = "false";
+			if(url.contains("mysql")) protocol = "MYSQL";
+			if(url.contains("oracle")) protocol = "ORACLE";
+			
+			result.put("protocol", protocol);
 			result.put("url", url);
 			result.put("username", username);
 			result.put("password", password);
 			result.put("sql", query);
 			
 			if(cmdLine.hasOption("f")) {
-				result.put("file", cmdLine.getOptionValue("f"));
+				file = cmdLine.getOptionValue("f");
 			}
 			
 			if(cmdLine.hasOption("file")) {
-				result.put("file", cmdLine.getOptionValue("file"));
+				file = cmdLine.getOptionValue("f");
 			}
 			
 			if(cmdLine.hasOption("headers")) {
-				result.put("headers", cmdLine.getOptionValue("headers"));
+				headers = "true";
 			}
 			
+			result.put("headers", headers);
+			result.put("file", file);
+			
+			if(protocol == null) throw new ParseException("Bad protocol");
 			
 		} catch (ParseException pe) {
 			//System.out.println("\n"+pe.getMessage()+"\n");
@@ -176,7 +187,7 @@ public class Launcher {
 		try {
 			Map<String, String> param = parse(args);
 			businessLogic(param.get("protocol"), param.get("url"), 
-					param.get("username"), param.get("password"), param.get("sql"), param.get("file"), false);
+					param.get("username"), param.get("password"), param.get("sql"), param.get("file"), param.get("headers").equalsIgnoreCase("true"));
 		} catch (ParseException pe) {
 			System.out.println(printUsage());
 		}
