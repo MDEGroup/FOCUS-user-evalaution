@@ -8,16 +8,24 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5">
 		<attributes>
+			<attribute name="module" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/ojdbc6.jar"/>
-	<classpathentry kind="lib" path="libs/commons-cli-1.2.jar"/>
-	<classpathentry kind="lib" path="libs/mysql-connector-java-5.1.22-bin.jar"/>
-	<classpathentry kind="lib" path="libs/opencsv-2.3.jar"/>
-	<classpathentry kind="lib" path="libs/commons-io-2.4.jar"/>
-	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+	<classpathentry kind="lib" path="C:/Users/matte/Desktop/Ingegneria del Software/Esercitazione/FOCUS-user-evaluation/SQLDump/target/lib/ojdbc6-11.2.0.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/matte/Desktop/Ingegneria del Software/Esercitazione/FOCUS-user-evaluation/SQLDump/target/lib/commons-cli-1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/matte/Desktop/Ingegneria del Software/Esercitazione/FOCUS-user-evaluation/SQLDump/target/lib/mysql-connector-java-5.1.22.jar"/>
+	<classpathentry kind="lib" path="C:/Users/matte/Desktop/Ingegneria del Software/Esercitazione/FOCUS-user-evaluation/SQLDump/target/lib/opencsv-2.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/matte/Desktop/Ingegneria del Software/Esercitazione/FOCUS-user-evaluation/SQLDump/target/lib/commons-io-2.4.jar"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
