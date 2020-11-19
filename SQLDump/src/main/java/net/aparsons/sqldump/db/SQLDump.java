@@ -8,6 +8,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,7 +55,9 @@ public final class SQLDump implements Runnable {
 			Connectors.load(driver);
 			
 			// Init Files
-			if (file == null) file = new File(Long.toString(System.currentTimeMillis()) + ".csv");
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss");
+			
+			if (file == null) file = new File(formatter.format(new Date()) + ".csv");
 			if (file.exists()) throw new FileExistsException("File already exists [" + file.getName() + "]");
 			
 			File tempFile = new File(file + ".tmp");

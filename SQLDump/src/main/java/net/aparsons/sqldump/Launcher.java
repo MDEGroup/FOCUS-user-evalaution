@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.aparsons.sqldump.db.Connectors.Connector;
+import net.aparsons.sqldump.db.Connectors;
 import net.aparsons.sqldump.db.SQLDump;
 
 import org.apache.commons.cli.CommandLine;
@@ -33,34 +34,42 @@ public class Launcher {
 	 */
 	public static Options getOptions() {
 		final Options options = new Options();
-		
-		 
+				
 		final Option urlOption = new Option("url", true, "A database url of the form jdbc:subprotocol:subname");
+		final Option usernameOption = new Option("user", true, "Database username");
+		final Option passwordOption = new Option("pass", true, "Database password");
+		final Option queryOption = new Option("sql", true, "The SQL query to be executed");
+		final Option fileOptionShort = new Option("f", true, "The file path to display query results");		
+		final Option fileOptionLong = new Option("file", true, "The file path to display query results");
+		final Option headersOption = new Option("headers", false, "Include headers option; set to false unless otherwise specified");		
+
+		options.addOption(urlOption);
+		options.addOption(usernameOption);
+		options.addOption(passwordOption);
+		options.addOption(queryOption);
 		
-		final OptionGroup urlGroup = new OptionGroup();
-		urlGroup.setRequired(true);
-		urlGroup.addOption(urlOption);
-		options.addOptionGroup(urlGroup);
+		OptionGroup fileOptionGroup = new OptionGroup();
+		fileOptionGroup.addOption(fileOptionLong);
+		fileOptionGroup.addOption(fileOptionShort);
 		
-		//COMPLETE THE METHOD
+		options.addOptionGroup(fileOptionGroup);
+		options.addOption(headersOption);
+		
 		return options;
 	}
 
 	/**
 	 * Prints the command line options to the console and return print usage as string
 	 */
-	public static String printUsage() {
+	public static void printUsage() {
 		HelpFormatter printer = new HelpFormatter();
-		
 		printer.printHelp("Help", getOptions());
-		//COMPLETE THE METHOD
-		return "";
 	}
 
 	
 	/**
 	 * This method parse the command line parameters and put to a hash map where the parameter name is key point and the argument is the value.
-	 * The hash map must contain all the required paramenter. If a mandory one is missed, it prints the parameter usage and throws an exception. 
+	 * The hash map must contain all the required parameters. If a mandatory one is missed, it prints the parameter usage and throws an exception. 
 	 * Use the parameter names defined in getOption method.
 	 * @param consoleParams Command line arguments
 	 * @throws ParseException 
@@ -71,20 +80,46 @@ public class Launcher {
 		try {
 			CommandLineParser parser = new GnuParser();
 			CommandLine cmdLine = parser.parse(getOptions(), consoleParams);
-			if(!cmdLine.hasOption("url")) throw new ParseException("No url is specifified");
+			if(!cmdLine.hasOption("url")) throw new ParseException("No url is specified");
 			String url = cmdLine.getOptionValue("url");
 			
-			//COMPLETE THE METHOD
+			if(!cmdLine.hasOption("user")) throw new ParseException("No user is specified");
+			String user = cmdLine.getOptionValue("user");
 			
+			if(!cmdLine.hasOption("pass")) throw new ParseException("No password is specified");
+			String pass = cmdLine.getOptionValue("pass");
+			
+			if(!cmdLine.hasOption("sql")) throw new ParseException("No query is specified");
+			String query = cmdLine.getOptionValue("sql");
+			
+			String file = null;
+			if(cmdLine.hasOption("f")) file = cmdLine.getOptionValue("f");	
+			else if (cmdLine.hasOption("file")) file = cmdLine.getOptionValue("file");
+			
+			Boolean headers = cmdLine.hasOption("headers");
+
+			String protocol=null;
+			if(url.contains("mysql")) protocol = "MYSQL";
+			if(url.contains("oracle")) protocol = "ORACLE";
+			result.put("protocol", protocol);
+			result.put("url", url);
+			result.put("username", user);
+			result.put("password", pass);
+			result.put("sql", query);
+			result.put("file", file);
+			if(headers) 
+				result.put("headers", "true");
+			else
+				result.put("headers", "false");
 			
 		} catch (ParseException pe) {
-			System.out.println(printUsage());
+			System.out.println(pe.getMessage());
 			throw pe;
 		}
+		
 		return result;
 	}
-	
-
+		
 	
 	
 	/**
@@ -92,7 +127,7 @@ public class Launcher {
 	 */
 	private static void businessLogic(String protocol, String url, String username, String password, String sql, String file, boolean includeHeaders) {
 		SQLDump dump = new SQLDump(Connector.valueOf(protocol), url, username, password, sql);
-		if (!file.isEmpty())
+		if (file!=null)
 			dump.setFile(new File(file));
 		if (includeHeaders) 
 			dump.setHeaders(true);
@@ -105,8 +140,9 @@ public class Launcher {
 	public static void main(String[] args) {
 		try {
 			Map<String, String> param = parse(args);
+			System.out.println(param.toString());
 			businessLogic(param.get("protocol"), param.get("url"), 
-					param.get("username"), param.get("password"), param.get("sql"), param.get("file"), false);
+					param.get("username"), param.get("password"), param.get("sql"), param.get("file"), param.get("headers").equalsIgnoreCase("true"));
 		} catch (ParseException pe) {
 			printUsage();
 		}
