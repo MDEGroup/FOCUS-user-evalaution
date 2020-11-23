@@ -6,6 +6,26 @@
 	<artifactId>SQLDump</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
+	<build>
+		<plugins>
+		<plugin>
+	        <artifactId>maven-assembly-plugin</artifactId>
+	        <configuration>
+	          <archive>
+	            <manifest>
+	              <mainClass>net.aparsons.sqldump.Launcher</mainClass>
+	            </manifest>
+	          </archive>
+	          <descriptorRefs>
+	            <descriptorRef>jar-with-dependencies</descriptorRef>
+	          </descriptorRefs>
+	        </configuration>
+	      </plugin>
+		</plugins>
+	</build>	
+
+
+
 	<dependencies>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -17,7 +37,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.22</version>
+			<version>8.0.22</version>
 		</dependency>
 
 		<dependency>
@@ -28,9 +48,9 @@
 
 		<!-- https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc6 -->
 		<dependency>
-			<groupId>com.oracle.database.jdbc</groupId>
-			<artifactId>ojdbc6</artifactId>
-			<version>11.2.0.4</version>
+		    <groupId>com.microsoft.sqlserver</groupId>
+		    <artifactId>mssql-jdbc</artifactId>
+		    <version>8.4.1.jre11</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/net.sf.opencsv/opencsv -->
@@ -47,7 +67,5 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
-
 </project>
