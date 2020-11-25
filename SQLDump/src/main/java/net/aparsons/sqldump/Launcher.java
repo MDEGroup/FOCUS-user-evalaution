@@ -1,11 +1,5 @@
 package net.aparsons.sqldump;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
-
 import net.aparsons.sqldump.db.Connectors.Connector;
 import net.aparsons.sqldump.db.SQLDump;
 
@@ -17,6 +11,10 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Launcher {
 
@@ -37,12 +35,46 @@ public class Launcher {
 		 
 		final Option urlOption = new Option("url", true, "A database url of the form jdbc:subprotocol:subname");
 		
+		final Option usernameOption = new Option("username", true, "Username for database access");
+		final Option passwordOption = new Option("password", true, "Password for database access");
+		final Option queryOption = new Option("query",true, "A database query");
+		final Option CSVOption = new Option("CSV", true, "File path for csv file");
+		final Option includeHeaderOption = new Option("includeHeader",true, "includeHeader");
+
+		
+		
 		final OptionGroup urlGroup = new OptionGroup();
 		urlGroup.setRequired(true);
 		urlGroup.addOption(urlOption);
-		options.addOptionGroup(urlGroup);
 		
-		//COMPLETE THE METHOD
+		final OptionGroup usernameGroup = new OptionGroup();
+		usernameGroup.setRequired(true);
+		usernameGroup.addOption(usernameOption);
+		
+		final OptionGroup passwordGroup = new OptionGroup();
+		passwordGroup.setRequired(true);
+		passwordGroup.addOption(passwordOption);
+		
+		final OptionGroup queryGroup = new OptionGroup();
+		queryGroup.setRequired(true);
+		queryGroup.addOption(queryOption);
+		
+		final OptionGroup csvGroup = new OptionGroup();
+		csvGroup.setRequired(false);
+		csvGroup.addOption(CSVOption);
+		
+		final OptionGroup headersGroup = new OptionGroup();
+		headersGroup.setRequired(false);
+		headersGroup.addOption(includeHeaderOption);
+		
+		
+		options.addOptionGroup(urlGroup);
+		options.addOptionGroup(usernameGroup);
+		options.addOptionGroup(passwordGroup);
+		options.addOptionGroup(queryGroup);
+		options.addOptionGroup(csvGroup);
+		options.addOptionGroup(headersGroup);
+		
 		return options;
 	}
 
@@ -51,10 +83,43 @@ public class Launcher {
 	 */
 	public static String printUsage() {
 		HelpFormatter printer = new HelpFormatter();
-		
-		printer.printHelp("Help", getOptions());
+		Options ops = getOptions();
+	
+		printer.printHelp("Help", ops);
+       Option urlOpt = ops.getOption("url") ;
+       
+     
+       String OptDescString = urlOpt.getDescription() + " ";
+       String OptUrlString = urlOpt.getOpt().concat("  ".concat(OptDescString)+"\n");
+
+       
+       Option UsernameOpt = ops.getOption("username");		
+       String OptUserDescString = UsernameOpt.getDescription() + " ";
+       String OptUserString = UsernameOpt.getOpt().concat("  ".concat(OptUserDescString)+"\n");
+
+       Option PassOpt = ops.getOption("password");
+       
+       String OptPassDescString = PassOpt.getDescription() + " ";
+       String OptPassString = PassOpt.getOpt().concat("  ".concat(OptPassDescString) +"\n");
+
+       Option QueryOpt = ops.getOption("query");	
+       String OptQueryDescString = QueryOpt.getDescription() + " ";
+       String OptQueryString = QueryOpt.getOpt().concat("  ".concat(OptQueryDescString)+"\n");
+
+       Option CSVOpt = ops.getOption("CSV");
+       String OptCSVFilePathOptDescString = CSVOpt.getDescription() + " ";
+       String OptCSVFilePathOptString = CSVOpt.getOpt().concat(" ".concat(OptCSVFilePathOptDescString)+"\n");
+
+       Option includeHeaders = ops.getOption("includeHeader");	
+       
+       String OptincludeHeadersDescString = includeHeaders.getDescription() + " ";
+       String OptincludeHeadersString = includeHeaders.getOpt().concat("  ".concat(OptincludeHeadersDescString)+"\n");
+
+
+       String finalOptString = new String(OptUrlString.concat(OptUserString).concat(OptPassString).concat(OptQueryString)).concat(OptCSVFilePathOptString).concat(OptincludeHeadersString);
+
 		//COMPLETE THE METHOD
-		return "";
+		return finalOptString;
 	}
 
 	
@@ -71,10 +136,32 @@ public class Launcher {
 		try {
 			CommandLineParser parser = new GnuParser();
 			CommandLine cmdLine = parser.parse(getOptions(), consoleParams);
+			
+
 			if(!cmdLine.hasOption("url")) throw new ParseException("No url is specifified");
 			String url = cmdLine.getOptionValue("url");
 			
-			//COMPLETE THE METHOD
+			if(!cmdLine.hasOption("username")) throw new ParseException("No username is specifified");
+			String username = cmdLine.getOptionValue("username");
+
+			if(!cmdLine.hasOption("password")) throw new ParseException("No password is specifified");
+			String password = cmdLine.getOptionValue("password");
+
+			if(!cmdLine.hasOption("query")) throw new ParseException("No query is specifified");
+			String query = cmdLine.getOptionValue("query");
+			
+			if(!cmdLine.hasOption("CSV")) throw new ParseException("No CSV is specifified");
+			String CSV = cmdLine.getOptionValue("CSV");
+			
+			if(!cmdLine.hasOption("includeHeader")) throw new ParseException("No header is specifified");
+			String includeHeader = cmdLine.getOptionValue("includeHeader");
+			
+			result.put("url",url);
+			result.put("username", username);
+			result.put("password", password);
+			result.put("query", query);
+			result.put("CSV", CSV);
+			result.put("includeHeader", includeHeader);
 			
 			
 		} catch (ParseException pe) {
