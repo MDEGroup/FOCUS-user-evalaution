@@ -33,16 +33,25 @@ public class Launcher {
 	 */
 	public static Options getOptions() {
 		final Options options = new Options();
-		
-		 
+				 
 		final Option urlOption = new Option("url", true, "A database url of the form jdbc:subprotocol:subname");
+		final Option username = new Option("user", true, "Username per accesso al database.");
+		final Option password = new Option("pass", true, "Password per accesso al database.");
+		final Option query = new Option("sql", true, "Query per interrogare il database.");
+		final Option filePath = new Option("f", true, "Percorso del file CSV.");
+		final Option includeHeaders = new Option("headers", false, "Headers del file CSV.");
 		
 		final OptionGroup urlGroup = new OptionGroup();
 		urlGroup.setRequired(true);
 		urlGroup.addOption(urlOption);
-		options.addOptionGroup(urlGroup);
+		urlGroup.addOption(username);
+		urlGroup.addOption(password);
+		urlGroup.addOption(query);
+		urlGroup.addOption(filePath);
+		urlGroup.addOption(includeHeaders);
 		
-		//COMPLETE THE METHOD
+		options.addOptionGroup(urlGroup);
+				
 		return options;
 	}
 
@@ -53,10 +62,10 @@ public class Launcher {
 		HelpFormatter printer = new HelpFormatter();
 		
 		printer.printHelp("Help", getOptions());
-		//COMPLETE THE METHOD
-		return "";
+		
+		return "java -jar SQLDump-0.0.1-SNAPSHOT.jar -url [jdbc:oracle:thin:@hostname:port:sid] -user [username] -pass [password] -sql [query]";
+		
 	}
-
 	
 	/**
 	 * This method parse the command line parameters and put to a hash map where the parameter name is key point and the argument is the value.
@@ -74,7 +83,30 @@ public class Launcher {
 			if(!cmdLine.hasOption("url")) throw new ParseException("No url is specifified");
 			String url = cmdLine.getOptionValue("url");
 			
-			//COMPLETE THE METHOD
+			if(!cmdLine.hasOption("user")) throw new ParseException("No user is specifified");
+			String user = cmdLine.getOptionValue("user");
+			result.put("user",user);
+			if(!cmdLine.hasOption("pass")) throw new ParseException("No pass is specifified");
+			String pass = cmdLine.getOptionValue("pass");
+			result.put("pass", pass);
+			if(!cmdLine.hasOption("sql")) throw new ParseException("No query is specifified");
+			String sql = cmdLine.getOptionValue("sql");
+			result.put("sql",sql);
+			
+			if(!cmdLine.hasOption("f")) {
+				result.put("f", "true");
+				throw new ParseException("No query is specifified");
+			}
+			String f = cmdLine.getOptionValue("f");
+			result.put("f", f);
+						
+			if(!cmdLine.hasOption("headers")) {
+				result.put("headers", "true");
+				throw new ParseException("No query is specifified");
+			}
+			String headers = cmdLine.getOptionValue("headers");
+			result.put("headers", headers);
+			
 			
 			
 		} catch (ParseException pe) {
@@ -83,10 +115,7 @@ public class Launcher {
 		}
 		return result;
 	}
-	
-
-	
-	
+		
 	/**
 	 * COMPLETED METHOD
 	 */
@@ -103,6 +132,9 @@ public class Launcher {
 	 * COMPLETED METHOD
 	 */
 	public static void main(String[] args) {
+		
+		getOptions();
+		
 		try {
 			Map<String, String> param = parse(args);
 			businessLogic(param.get("protocol"), param.get("url"), 
