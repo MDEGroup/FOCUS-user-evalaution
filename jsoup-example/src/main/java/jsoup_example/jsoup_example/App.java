@@ -13,6 +13,7 @@ import org.jsoup.select.Elements;
  * Hello world!
  *
  */
+
 public class App {
 
 	static final String category = "calciomercato";
@@ -73,19 +74,18 @@ public class App {
 		for(Element score: scores) {
 			
 			try {
-				// Get Home Team Score
+				// Punteggio della squadra di casa
 				String homeScoreString = score.getElementsByClass("hom").first().ownText();
 				int homeScore = Integer.parseInt(homeScoreString);
 								
-				// Get Away Team Score
+				// Punteggio della squadra ospite
 				String awayScoreString = score.getElementsByClass("awy").first().ownText();
 				int awayScore = Integer.parseInt(awayScoreString);
 				
-				// Aggiungo alla lista la squadra che ha segnato più goals
+				// Aggiungo alla lista la squadra che ha vinto l'incontro
 				if(homeScore > awayScore) {
 					result.add(score.parent().getElementsByClass("ply tright name").first().children().first().ownText());
 				}
-				
 				else if(homeScore < awayScore) {
 					result.add(score.parent().getElementsByClass("ply name").first().children().first().ownText());
 				}
@@ -120,7 +120,7 @@ public class App {
 		for(Element weather: weathers) {
 			
 			try {
-				// Get minTemperature
+				// Temperatura minima
 				String minTemperatureString = (weather.parents().get(2).getElementsByClass("temperature").get(0).ownText().replace("°", ""));
 				int minTemperature = Integer.parseInt(minTemperatureString);
 
