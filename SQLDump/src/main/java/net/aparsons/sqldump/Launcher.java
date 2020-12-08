@@ -1,8 +1,6 @@
 package net.aparsons.sqldump;
 
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,30 +29,35 @@ public class Launcher {
 	 *  All the options contains and argument, with the exception of includeHeaders   
 	 * @return Available command line options
 	 */
-	public static Options getOptions() {
+	public static Options getOptions() 
+	{
 		final Options options = new Options();
 		
-		 
 		final Option urlOption = new Option("url", true, "A database url of the form jdbc:subprotocol:subname");
-		
+		final Option usernameOption = new Option("user", true, "Username per accedere al db");
+		final Option passwordOption = new Option("pass", true, "Password per accedere al db");
+		final Option queryOption = new Option("sql", true, "Query di interrogazione");
+		final Option csvOption = new Option("f", true, "Percorso file csv");
+		final Option headersOption = new Option("headers", false, "Headers devl file csv");
+	
 		final OptionGroup urlGroup = new OptionGroup();
 		urlGroup.setRequired(true);
-		urlGroup.addOption(urlOption);
+		urlGroup.addOption(urlOption).addOption(usernameOption).addOption(passwordOption).addOption(queryOption).addOption(csvOption).addOption(headersOption);
 		options.addOptionGroup(urlGroup);
 		
-		//COMPLETE THE METHOD
 		return options;
 	}
 
 	/**
 	 * Prints the command line options to the console and return print usage as string
 	 */
-	public static String printUsage() {
+	public static String printUsage() 
+	{
 		HelpFormatter printer = new HelpFormatter();
-		
 		printer.printHelp("Help", getOptions());
-		//COMPLETE THE METHOD
-		return "";
+
+		return "java -jar [nomeFileJar.jar] -url [jdbc:oracle:thin:@hostname:port:sid] -user [username]" + 
+				"-pass [password] -sql [query]";
 	}
 
 	
@@ -68,16 +71,43 @@ public class Launcher {
 	 */
 	public static Map<String, String> parse(String[] consoleParams) throws ParseException {
 		Map<String, String> result = new HashMap<String, String>();
-		try {
+		try 
+		{
 			CommandLineParser parser = new GnuParser();
 			CommandLine cmdLine = parser.parse(getOptions(), consoleParams);
 			if(!cmdLine.hasOption("url")) throw new ParseException("No url is specifified");
 			String url = cmdLine.getOptionValue("url");
-			
-			//COMPLETE THE METHOD
-			
-			
-		} catch (ParseException pe) {
+			result.put("url",url);
+			if(!cmdLine.hasOption("user")) throw new ParseException("No user is specifified");
+			String user = cmdLine.getOptionValue("user");
+			result.put("user",user);
+			if(!cmdLine.hasOption("pass")) throw new ParseException("No pass is specifified");
+			String pass = cmdLine.getOptionValue("pass");
+			result.put("pass", pass);
+			if(!cmdLine.hasOption("sql")) throw new ParseException("No query is specifified");
+			String sql = cmdLine.getOptionValue("sql");
+			result.put("sql",sql);
+			if(!cmdLine.hasOption("f")) 
+			{
+				result.put("f", cmdLine.getOptionValue("f"));
+				throw new ParseException("No file path  is specifified");
+			}
+			else
+			{
+				result.put("f", "true");
+			}
+			if(!cmdLine.hasOption("headers")) 
+			{
+				result.put("headers", cmdLine.getOptionValue("headers"));
+				throw new ParseException("No  include column headers  is specifified");
+			}
+			else
+			{
+				result.put("headers", "true");
+			}
+		} 
+		catch (ParseException pe) 
+		{
 			System.out.println(printUsage());
 			throw pe;
 		}
@@ -90,7 +120,8 @@ public class Launcher {
 	/**
 	 * COMPLETED METHOD
 	 */
-	private static void businessLogic(String protocol, String url, String username, String password, String sql, String file, boolean includeHeaders) {
+	private static void businessLogic(String protocol, String url, String username, String password, String sql, String file, boolean includeHeaders) 
+	{
 		SQLDump dump = new SQLDump(Connector.valueOf(protocol), url, username, password, sql);
 		if (!file.isEmpty())
 			dump.setFile(new File(file));
@@ -102,13 +133,17 @@ public class Launcher {
 	/**
 	 * COMPLETED METHOD
 	 */
-	public static void main(String[] args) {
-		try {
+	public static void main(String[] args) 
+	{
+		try 
+		{
 			Map<String, String> param = parse(args);
 			businessLogic(param.get("protocol"), param.get("url"), 
 					param.get("username"), param.get("password"), param.get("sql"), param.get("file"), false);
-		} catch (ParseException pe) {
+		} catch (ParseException pe) 
+		{
 			printUsage();
+		
 		}
 	}
 
