@@ -36,13 +36,43 @@ public class Launcher {
 		
 		 
 		final Option urlOption = new Option("url", true, "A database url of the form jdbc:subprotocol:subname");
+		final Option usernameOption = new Option("user", true, "username for database access");
+		final Option passwordOption = new Option("pass", true, "password for database access");
+		final Option queryOption = new Option("sql", true, "query for the database");
+		final Option fileOption = new Option("f", "file", true, "filepath for the csv file");
+		final Option headersOption = new Option("headers", false, "headers option");
+		final Option protocolOption = new Option("protocol", true, "protocol option");
 		
+		final OptionGroup protocolGroup = new OptionGroup();
+		protocolGroup.setRequired(true);
+		protocolGroup.addOption(protocolOption);
 		final OptionGroup urlGroup = new OptionGroup();
 		urlGroup.setRequired(true);
 		urlGroup.addOption(urlOption);
-		options.addOptionGroup(urlGroup);
+		final OptionGroup usernameGroup = new OptionGroup();
+		usernameGroup.setRequired(true);
+		usernameGroup.addOption(usernameOption);
+		final OptionGroup passwordGroup = new OptionGroup();
+		passwordGroup.setRequired(true);
+		passwordGroup.addOption(passwordOption);
+		final OptionGroup queryGroup = new OptionGroup();
+		queryGroup.setRequired(true);
+		queryGroup.addOption(queryOption);
+		final OptionGroup fileGroup = new OptionGroup();
+		fileGroup.setRequired(false);
+		fileGroup.addOption(fileOption);
+		final OptionGroup headersGroup = new OptionGroup();
+		headersGroup.setRequired(false);
+		headersGroup.addOption(headersOption);
 		
-		//COMPLETE THE METHOD
+		options.addOptionGroup(urlGroup);
+		options.addOptionGroup(usernameGroup);
+		options.addOptionGroup(passwordGroup);
+		options.addOptionGroup(queryGroup);
+		options.addOptionGroup(fileGroup);
+		options.addOptionGroup(headersGroup);
+		options.addOptionGroup(protocolGroup);
+		
 		return options;
 	}
 
@@ -53,8 +83,8 @@ public class Launcher {
 		HelpFormatter printer = new HelpFormatter();
 		
 		printer.printHelp("Help", getOptions());
-		//COMPLETE THE METHOD
-		return "";
+		
+		return "java -jar SQLDump-0.0.1-jar-with-dependencies.jar -url [jdbc:oracle:thin:@hostname:port:sid] -user [username] -pass [password] -sql [query]";
 	}
 
 	
@@ -68,18 +98,41 @@ public class Launcher {
 	 */
 	public static Map<String, String> parse(String[] consoleParams) throws ParseException {
 		Map<String, String> result = new HashMap<String, String>();
-		try {
-			CommandLineParser parser = new GnuParser();
-			CommandLine cmdLine = parser.parse(getOptions(), consoleParams);
-			if(!cmdLine.hasOption("url")) throw new ParseException("No url is specifified");
-			String url = cmdLine.getOptionValue("url");
-			
-			//COMPLETE THE METHOD
-			
-			
-		} catch (ParseException pe) {
-			System.out.println(printUsage());
-			throw pe;
+		if(!(consoleParams.length == 0)) {
+			try {
+				CommandLineParser parser = new GnuParser();
+				CommandLine cmdLine = parser.parse(getOptions(), consoleParams);
+				if(!cmdLine.hasOption("url")) throw new ParseException("No url is specifified");
+				String url = cmdLine.getOptionValue("url");
+				if(!cmdLine.hasOption("user")) throw new ParseException("No user is specifified");
+				String user = cmdLine.getOptionValue("user");
+				if(!cmdLine.hasOption("pass")) throw new ParseException("No password is specifified");
+				String pass = cmdLine.getOptionValue("pass");
+				if(!cmdLine.hasOption("query")) throw new ParseException("No query is specifified");
+				String query = cmdLine.getOptionValue("query");
+				if(!cmdLine.hasOption("protocol")) throw new ParseException("No protocol is specifified");
+				String protocol = cmdLine.getOptionValue("protocol");
+				String file = null;
+				if(cmdLine.hasOption("file"))file = cmdLine.getOptionValue("file");
+				boolean headers = false;
+				if(cmdLine.hasOption("headers"))headers = true;
+				result.put("url", url);
+				result.put("username", user);
+				result.put("password", pass);
+				result.put("protocol", protocol);
+				result.put("query", query);
+				if(file!=null) {
+					result.put("file", file);
+				}
+				if(headers) {
+					result.put("headers", "true");
+				}
+				
+
+			} catch (ParseException pe) {
+				System.out.println();
+				throw pe;
+			}
 		}
 		return result;
 	}
@@ -104,11 +157,15 @@ public class Launcher {
 	 */
 	public static void main(String[] args) {
 		try {
-			Map<String, String> param = parse(args);
-			businessLogic(param.get("protocol"), param.get("url"), 
-					param.get("username"), param.get("password"), param.get("sql"), param.get("file"), false);
+			
+				Map<String, String> param = parse(args);
+			if(!param.isEmpty()) {
+				businessLogic(param.get("protocol"), param.get("url"), 
+						param.get("username"), param.get("password"), param.get("sql"), param.get("file"), false);
+			}else throw new ParseException("No paramaters specified");
+			
 		} catch (ParseException pe) {
-			printUsage();
+			System.out.println(printUsage());
 		}
 	}
 
