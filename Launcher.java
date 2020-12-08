@@ -36,12 +36,21 @@ public class Launcher {
 		
 		 
 		final Option urlOption = new Option("url", true, "A database url of the form jdbc:subprotocol:subname");
+		final Option user = new Option("user", true, "Username used for database access");
+		user.setArgName("username");
+		final Option pass = new Option("pass", true, "Password used for database access");
+		pass.setArgName("password");
+		final Option query = new Option("sql", true, "SQL query used for database interrogation");
+		query.setArgName("query");
+		final Option file = new Option("f", "file", true, "Filepath for the csv file");
+		file.setArgName("filepath");
+		final Option headers = new Option("headers", false, "Headers option");
 		
-		final OptionGroup urlGroup = new OptionGroup();
-		urlGroup.setRequired(true);
-		urlGroup.addOption(urlOption);
-		options.addOptionGroup(urlGroup);
-		
+		OptionGroup mandatory = new OptionGroup().addOption(urlOption).addOption(user).addOption(pass).addOption(query);
+		mandatory.setRequired(true);
+		options.addOptionGroup(mandatory);
+		options.addOption(file);
+		options.addOption(headers);
 		//COMPLETE THE METHOD
 		return options;
 	}
@@ -54,7 +63,7 @@ public class Launcher {
 		
 		printer.printHelp("Help", getOptions());
 		//COMPLETE THE METHOD
-		return "";
+	  return "\"java -jar SQLDump-0.0.1-jar-with-dependencies.jar -url [jdbc:oracle:thin:@hostname:port:sid] -user [username] -pass [password] -sql [query]\"";
 	}
 
 	
@@ -73,6 +82,22 @@ public class Launcher {
 			CommandLine cmdLine = parser.parse(getOptions(), consoleParams);
 			if(!cmdLine.hasOption("url")) throw new ParseException("No url is specifified");
 			String url = cmdLine.getOptionValue("url");
+			if(!cmdLine.hasOption("user")) throw new ParseException("No user is specifified");
+			String user = cmdLine.getOptionValue("user");
+			if(!cmdLine.hasOption("pass")) throw new ParseException("No password is specifified");
+			String pass = cmdLine.getOptionValue("pass");
+			if(!cmdLine.hasOption("sql")) throw new ParseException("No query is specifified");
+			String query = cmdLine.getOptionValue("sql");
+			
+			result.put("url", url);
+			result.put("user", user);
+			result.put("pass", pass);
+			result.put("sql", query);
+			if(cmdLine.hasOption("file"))
+				result.put("file", cmdLine.getOptionValue("file"));
+			
+			if(cmdLine.hasOption("headers"))
+				result.put("headers", cmdLine.getOptionValue("headers"));
 			
 			//COMPLETE THE METHOD
 			
